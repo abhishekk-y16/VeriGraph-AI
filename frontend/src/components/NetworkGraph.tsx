@@ -156,7 +156,7 @@ export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs uppercase tracking-[0.2em] text-[#97d4ee]">Coordination Network</p>
-        <p className="text-xs text-[#9fbfd0]">Drag nodes • Click for details</p>
+        <p className="text-xs text-[#9fbfd0]"></p>
       </div>
 
       <div ref={containerRef} className="mt-4 h-96 rounded-2xl border border-white/10 bg-[#081b25] relative group">
