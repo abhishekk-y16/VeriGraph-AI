@@ -1,5 +1,5 @@
 """
-VeriGraph Flask API Application
+VeriGraph Flask API WebApplication
 Main entry point for the backend service
 """
 
