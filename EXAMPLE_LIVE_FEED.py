@@ -40,7 +40,7 @@ example_data = {
 }
 
 # ============================================
-# REACT COMPONENT USAGE
+# REACT COMPONENT USAGE FOR AMPLICATION
 # ============================================
 
 """
