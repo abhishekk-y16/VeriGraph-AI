@@ -94,7 +94,7 @@ async def test_facebook_search_api_error():
     """Test Facebook search handles API errors in response."""
     client = FacebookClient()
     with patch.dict("core.settings.settings.__dict__", {"facebook_access_token": "test_token"}):
-        # This test verifies error handling in the API response JSON
+        # This test verifies error handling in the API response JSON 
         pass
 
 
