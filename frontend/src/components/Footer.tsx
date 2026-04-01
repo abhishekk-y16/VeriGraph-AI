@@ -12,7 +12,7 @@ export function Footer() {
           <div>
             <h3 className="text-xl font-bold text-[#e8f5ff] mb-4">VeriGraph AI</h3>
             <p className="text-sm text-[#96c9df] leading-relaxed">
-              Real-time coordinated misinformation detection powered by hybrid intelligence.
+              Real-time Coordinated misinformation Detection Powered by Hybrid intelligence.
             </p>
           </div>
 
