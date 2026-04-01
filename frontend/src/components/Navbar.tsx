@@ -26,7 +26,7 @@ export function Navbar() {
             href="/analysis"
             className="rounded-full border border-[#8ad7ff]/50 px-4 py-2 font-medium transition hover:border-[#8ad7ff] hover:bg-[#8ad7ff]/20"
           >
-            Dashboard 
+            Dashboard
           </Link>
         </div>
       </nav>
