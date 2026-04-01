@@ -103,7 +103,7 @@ export function ScoreDisplay({ score, riskLevel, resultStatus = "final", confide
           
           <div className="space-y-3 border-t border-white/10 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-[#96c9df]">Risk Level</span>
+              <span className="text-sm font-medium text-[#96c9df]">Risk Level </span>
               <span className="px-3 py-1.5 rounded-full text-sm font-semibold" style={{
                 backgroundColor: `${tone}15`,
                 color: tone,
