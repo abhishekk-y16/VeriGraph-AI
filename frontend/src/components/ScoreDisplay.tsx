@@ -49,7 +49,7 @@ export function ScoreDisplay({ score, riskLevel, resultStatus = "final", confide
       aria-label={`Threat assessment: ${animatedScore} out of 100, Risk level: ${riskLevel}`}
       role="region"
     >
-      <p className="text-xs uppercase tracking-[0.2em] font-semibold text-[#96c9df]">Threat Assessment</p>
+      <p className="text-xs uppercase tracking-[0.2em] font-semibold text-[#96c9df]">Threat Assessment </p>
       <div className="mt-7 flex flex-wrap items-center gap-12">
         <motion.div 
           className="relative h-52 w-52" 
