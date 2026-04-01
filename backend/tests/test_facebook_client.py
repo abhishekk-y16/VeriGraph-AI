@@ -48,7 +48,7 @@ async def test_facebook_search_success(facebook_client, mock_facebook_response):
             mock_get.return_value.__aenter__.return_value.get = AsyncMock(return_value=mock_response)
             
             # Note: Mock setup for context manager is complex, using actual search
-            # In real tests, use more sophisticated mocking
+            # In real tests, use more sophisticated mocking 
             pass
 
 
