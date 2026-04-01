@@ -7,7 +7,7 @@ class Settings(BaseSettings):
 
     google_news_max_results: int = 40
     gdelt_max_results: int = 40
-    commoncrawl_max_results: int = 1000  # Web-scale search: up to 1000 pages
+    commoncrawl_max_results: int = 1000  # Web-scale search: up to 1000 pages max
     commoncrawl_timeout: int = 30  # Allow extra time for web-scale queries
 
     telegram_api_id: str = ""
