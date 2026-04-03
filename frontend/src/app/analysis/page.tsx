@@ -113,7 +113,7 @@ export default function AnalysisPage() {
             href="/"
             className="mt-8 rounded-full border border-[#8adfff]/60 bg-[#73d6ff]/20 px-6 py-3 text-sm font-semibold text-[#def5ff] transition hover:bg-[#73d6ff]/35"
           >
-            Go To Home
+            Go To Home 
           </Link>
         </main>
         <Footer />
