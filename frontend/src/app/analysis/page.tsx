@@ -107,7 +107,7 @@ export default function AnalysisPage() {
         <main className="mx-auto flex min-h-[70vh] w-full max-w-4xl flex-col items-center justify-center px-6 text-center">
           <h1 className="text-3xl font-semibold text-white">No Live Analysis Result Found</h1>
           <p className="mt-4 max-w-2xl text-[#b9d8e8]">
-            Start from the home page and run a live analysis. Mock results are disabled.
+            Start from the home page and run a live analysis.Mock results are disabled.
           </p>
           <Link
             href="/"
