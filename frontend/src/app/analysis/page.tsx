@@ -208,7 +208,7 @@ export default function AnalysisPage() {
                 <h2 className="text-2xl font-semibold text-white mb-6">
                   Top Amplifiers
                 </h2>
-                <LiveAmplificationFeed posts={amplificationPosts} isLive={false} />
+                <LiveAmplification Feed posts={amplificationPosts} isLive={false} />
               </motion.section>
             )}
           </>
