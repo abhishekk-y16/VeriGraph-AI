@@ -42,7 +42,7 @@ class ScraperService:
         deduped: list[dict] = []
         
         for post in posts:
-            # Try to extract URL from urls field (preferred) or use text as fallback
+            # Try to extract URL from urls field (preferred) or use text as fallback 
             urls = post.get("urls", [])
             post_url = urls[0] if urls else post.get("text", "")
             
