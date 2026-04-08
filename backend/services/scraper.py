@@ -53,7 +53,7 @@ class ScraperService:
             normalized_url = post_url.lower().strip()
             
             if normalized_url in seen_urls:
-                # URL already seen - would increase confidence in production
+                # URL already seen - would increase confidence in production 
                 continue
             
             seen_urls.add(normalized_url)
