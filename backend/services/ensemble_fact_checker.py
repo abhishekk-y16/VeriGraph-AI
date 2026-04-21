@@ -1,7 +1,7 @@
 """
 Ensemble Fact Checker combining multiple ML models
  BART-MNLI (57% weight): Zero-shot classification
-- RoBERTa (43% weight): Sequence classification 
+ RoBERTa (43% weight): Sequence classification 
 """
 
 from typing import Dict
