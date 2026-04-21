@@ -11,7 +11,7 @@ from core.settings import settings
 
 
 class NewsAPIVerifier:
-    """Validate selected news posts against NewsAPI search results. """
+    """Validate selected news posts against NewsAPI search results.  """
 
     SOURCE_ALIASES: dict[str, dict[str, list[str]]] = {
         "bbc": {"sources": ["bbc-news"], "domains": ["bbc.com", "bbc.co.uk"], "names": ["bbc news", "bbc"]},
