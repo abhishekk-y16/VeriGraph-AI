@@ -2,31 +2,32 @@
 
 import { motion } from "framer-motion";
 import { FeatureCard } from "@/components/FeatureCard";
+import { containerVariants, itemVariants, slideUpVariants } from "@/lib/animations";
 
 const features = [
   {
     title: "Semantic Threat Signal",
     description:
       "Transformer-powered language analysis catches manipulative patterns, urgency framing, and sentiment pressure in real time.",
-    accent: "#33c4ff",
+    accent: "#3B82F6",
   },
   {
     title: "Coordination Graph Lens",
     description:
       "Force-directed relationship graph surfaces synchronized bursts, repeated links, and account cluster behavior instantly.",
-    accent: "#63f9d2",
+    accent: "#10B981",
   },
   {
     title: "Fact Validation Layer",
     description:
       "Gemini fact verification adds truth assessment with confidence scoring and compact evidence explanation.",
-    accent: "#f8d46b",
+    accent: "#F59E0B",
   },
   {
     title: "Realtime Intelligence Feed",
     description:
       "Live post cards animate into view while counters and cluster metrics update smoothly for a broadcast-style experience.",
-    accent: "#ff7d6b",
+    accent: "#EF4444",
   },
 ];
 
@@ -34,36 +35,28 @@ export function FeatureShowcase() {
   return (
     <motion.section
       id="features"
-      initial="hidden"
-      whileInView="show"
+      variants={containerVariants}
+      initial="initial"
+      whileInView="animate"
       viewport={{ once: true, amount: 0.2 }}
-      variants={{
-        hidden: {},
-        show: {
-          transition: {
-            staggerChildren: 0.12,
-          },
-        },
-      }}
       className="mx-auto w-full max-w-7xl px-6 py-16"
     >
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-        Why VeriGraph feels different
-      </h2>
-      <p className="mt-4 max-w-3xl text-[#c8e1ee]">
-        This is not a static report. It is a living misinformation radar with layered evidence and
-        tactile interactions.
-      </p>
+      <motion.div variants={itemVariants}>
+        <h2 className="text-display font-bold tracking-tight text-text-primary">
+          Why VeriGraph feels different
+        </h2>
+        <p className="mt-4 max-w-3xl text-body-lg text-text-secondary">
+          This is not a static report. It is a living misinformation radar with layered evidence and
+          tactile interactions.
+        </p>
+      </motion.div>
       
       {/* Process Timeline */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.6 }}
-        className="mt-12 rounded-2xl border border-white/15 bg-white/[0.06] p-8 mb-10"
+        variants={slideUpVariants}
+        className="mt-12 rounded-lg border border-border-default bg-surface-1 p-8 mb-10 shadow-md"
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-[#96c9df] font-semibold mb-6">Analysis Pipeline</p>
+        <p className="text-caption font-semibold text-text-tertiary uppercase tracking-wider mb-6">Analysis Pipeline</p>
         <div className="flex flex-wrap items-center justify-between gap-0">
           {[
             { label: "Input Claim", icon: "📝" },
@@ -81,12 +74,12 @@ export function FeatureShowcase() {
               transition={{ delay: idx * 0.12 }}
             >
               <motion.div
-                className="relative z-10 w-12 h-12 rounded-full border-2 border-[#73d6ff] bg-[#0a2535] flex items-center justify-center mb-2 text-lg"
-                whileHover={{ boxShadow: "0 0 15px rgba(115, 214, 255, 0.4)", scale: 1.08 }}
+                className="relative z-10 w-12 h-12 rounded-full border-2 border-primary-600 bg-surface-2 flex items-center justify-center mb-2 text-lg shadow-md"
+                whileHover={{ boxShadow: "0 0 15px rgba(37, 99, 235, 0.4)", scale: 1.08 }}
               >
                 {item.icon}
               </motion.div>
-              <span className="text-xs font-semibold text-[#dcf1fb] text-center">{item.label}</span>
+              <span className="text-caption font-semibold text-text-primary text-center">{item.label}</span>
             </motion.div>
           ))}
         </div>
@@ -96,10 +89,7 @@ export function FeatureShowcase() {
         {features.map((feature) => (
           <motion.div
             key={feature.title}
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.55 } },
-            }}
+            variants={itemVariants}
           >
             <FeatureCard {...feature} />
           </motion.div>

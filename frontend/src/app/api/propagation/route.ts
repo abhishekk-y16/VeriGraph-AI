@@ -18,7 +18,25 @@ export async function POST(request: NextRequest) {
       });
       
       if (!response.ok) {
-        throw new Error(`Backend error: ${response.status}`);
+        const errorText = await response.text();
+        let errorBody: { detail?: string; error?: string } | null = null;
+
+        try {
+          errorBody = errorText ? JSON.parse(errorText) : null;
+        } catch {
+          errorBody = null;
+        }
+
+        return NextResponse.json(
+          {
+            error:
+              errorBody?.detail ||
+              errorBody?.error ||
+              errorText ||
+              `Backend error: ${response.status} ${response.statusText}`,
+          },
+          { status: response.status }
+        );
       }
       
       const data = await response.json();

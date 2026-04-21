@@ -25,6 +25,17 @@ export interface GraphLink {
   kind: "semantic" | "temporal" | "url";
 }
 
+export interface SourceVerification {
+  provider: "NewsAPI";
+  status: "verified" | "ambiguous" | "unmatched" | "disabled";
+  message: string;
+  confidence?: number | null;
+  queryUsed?: string | null;
+  matchedTitle?: string | null;
+  matchedUrl?: string | null;
+  matchedSource?: string | null;
+}
+
 export interface PostItem {
   id: string;
   username: string;
@@ -32,6 +43,9 @@ export interface PostItem {
   text: string;
   likes: number;
   shares: number;
+  url?: string | null;
+  sourceName?: string | null;
+  sourceVerification?: SourceVerification | null;
 }
 
 export interface AnalysisResult {

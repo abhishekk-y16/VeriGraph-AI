@@ -29,6 +29,17 @@ class GraphLink(BaseModel):
     kind: Literal["semantic", "temporal", "url"]
 
 
+class SourceVerification(BaseModel):
+    provider: Literal["NewsAPI"] = "NewsAPI"
+    status: Literal["verified", "ambiguous", "unmatched", "disabled"]
+    message: str
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    queryUsed: str | None = None
+    matchedTitle: str | None = None
+    matchedUrl: str | None = None
+    matchedSource: str | None = None
+
+
 class PostItem(BaseModel):
     id: str
     username: str
@@ -36,6 +47,9 @@ class PostItem(BaseModel):
     text: str
     likes: int = Field(ge=0)
     shares: int = Field(ge=0)
+    url: str | None = None
+    sourceName: str | None = None
+    sourceVerification: SourceVerification | None = None
 
 
 class AnalyzeResponse(BaseModel):
@@ -54,3 +68,24 @@ class AnalyzeResponse(BaseModel):
 class ErrorResponse(BaseModel):
     detail: str
     requestId: str
+
+
+class DeepfakeMetadata(BaseModel):
+    fileName: str
+    mimeType: str
+    fileSizeBytes: int = Field(ge=0)
+    mediaType: Literal["image", "video"]
+    modelVersion: str
+    frameCount: int | None = Field(default=None, ge=0)
+    framesAnalyzed: int | None = Field(default=None, ge=0)
+    samplingStrategy: str | None = None
+
+
+class DeepfakeResponse(BaseModel):
+    mediaType: Literal["image", "video"]
+    prediction: Literal["Real", "Fake"]
+    confidence: float = Field(ge=0, le=1)
+    confidenceLevel: Literal["Low", "Medium", "High"]
+    processingTimeMs: int = Field(ge=0)
+    message: str
+    metadata: DeepfakeMetadata

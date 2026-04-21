@@ -1,8 +1,7 @@
 """
-Ensemble Fact Checker combining multiple ML models for 96% accuracy
-- BART-MNLI (40% weight): Zero-shot classification
-- RoBERTa (35% weight): Sequence classification
-- DistilBERT (25% weight): Fast lightweight model
+Ensemble Fact Checker combining multiple ML models
+- BART-MNLI (57% weight): Zero-shot classification
+- RoBERTa (43% weight): Sequence classification
 """
 
 from typing import Dict
@@ -15,9 +14,8 @@ class EnsembleFactChecker:
     """Combines three fact-checking models with weighted voting"""
 
     WEIGHTS = {
-        "bart": 0.40,
-        "roberta": 0.35,
-        "distilbert": 0.25,
+        "bart": 0.57,
+        "roberta": 0.43,
     }
     
     CATEGORIES = ["true news", "false news", "misleading"]
@@ -57,17 +55,6 @@ class EnsembleFactChecker:
                 self.initialized_models.append("roberta")
             except Exception as e:
                 print(f"Warning: RoBERTa init failed: {e}")
-            
-            # DistilBERT
-            try:
-                self.models["distilbert"] = pipeline(
-                    "zero-shot-classification",
-                    model="distilbert-base-uncased-finetuned-sst-2-english",
-                    device=device,
-                )
-                self.initialized_models.append("distilbert")
-            except Exception as e:
-                print(f"Warning: DistilBERT init failed: {e}")
             
             self.initialized = len(self.initialized_models) > 0
             
@@ -158,7 +145,7 @@ class EnsembleFactChecker:
                 "evidence": {
                     "classification": final_label,
                     "confidence": final_confidence,
-                    "model": "Ensemble (BART + RoBERTa + DistilBERT)",
+                    "model": "Ensemble (BART + RoBERTa)",
                     "agreement_score": float(round(agreement, 3)),
                     "model_consensus": unique_labels == 1,
                     "individual_predictions": {

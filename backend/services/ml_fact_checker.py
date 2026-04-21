@@ -1,11 +1,29 @@
 """
-ML-based Fact Checker using DistilBERT
+ML-based Fact Checker using BART-MNLI
 Replaces Gemini API with local ML model for fast, free fact-checking
 """
 
 from typing import Dict
-import torch
-from transformers import pipeline
+
+try:
+    import torch
+except Exception:
+    torch = None
+
+
+def _torch_version_supports_transformers() -> bool:
+    if torch is None:
+        return False
+
+    version = getattr(torch, "__version__", "0.0.0").split("+")[0]
+    parts = version.split(".")
+    try:
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+    except ValueError:
+        return False
+
+    return (major, minor) >= (2, 4)
 
 
 class MLFactChecker:
@@ -21,10 +39,19 @@ class MLFactChecker:
     def __init__(self):
         """Initialize the zero-shot classification pipeline"""
         try:
+            if not _torch_version_supports_transformers():
+                self.pipe = None
+                self.categories = ["true news", "false news", "misleading"]
+                self.initialized = False
+                return
+
+            from transformers import pipeline
+
+            device = 0 if torch is not None and torch.cuda.is_available() else -1
             self.pipe = pipeline(
                 "zero-shot-classification",
                 model="facebook/bart-large-mnli",
-                device=0 if torch.cuda.is_available() else -1,
+                device=device,
             )
             self.categories = ["true news", "false news", "misleading"]
             self.initialized = True

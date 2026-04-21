@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { motion } from "framer-motion";
+import { Card } from "@/components/ui";
+import { slideUpVariants } from "@/lib/animations";
 import type { GraphLink, GraphNode } from "@/types/analysis";
 import { DEFAULT_GRAPH_NODES, DEFAULT_GRAPH_LINKS } from "@/lib/graph-fallback";
 
@@ -14,12 +16,13 @@ interface NetworkGraphProps {
 type SimNode = d3.SimulationNodeDatum & GraphNode;
 type SimLink = d3.SimulationLinkDatum<SimNode> & GraphLink;
 
-const clusterColors = ["#58d3ff", "#7df5c5", "#ffd479", "#ff8f7e"];
+// Updated color palette: primary #2563EB, green #10B981, yellow #F59E0B, red #EF4444
+const clusterColors = ["#2563EB", "#10B981", "#F59E0B", "#EF4444"];
 
 function linkColor(kind: GraphLink["kind"]) {
-  if (kind === "semantic") return "#59d4ff";
-  if (kind === "temporal") return "#f8be5f";
-  return "#ff7d6b";
+  if (kind === "semantic") return "#3B82F6";
+  if (kind === "temporal") return "#F59E0B";
+  return "#EF4444";
 }
 
 export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
@@ -97,7 +100,7 @@ export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
       .join("circle")
       .attr("r", (d: SimNode) => 8 + Math.sqrt(d.followers) / 18)
       .attr("fill", (d: SimNode) => clusterColors[d.cluster % clusterColors.length])
-      .attr("stroke", "#0d1f2a")
+      .attr("stroke", "#051428")
       .attr("stroke-width", 2)
       .style("cursor", "pointer")
       .on("click", (_event: MouseEvent, d: SimNode) => setSelected(d))
@@ -127,7 +130,7 @@ export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
       .join("text")
       .text((d: SimNode) => d.label)
       .attr("font-size", 10)
-      .attr("fill", "#e6f3f9")
+      .attr("fill", "#A3D3E8")
       .attr("dx", 10)
       .attr("dy", 4)
       .style("pointer-events", "none");
@@ -149,42 +152,42 @@ export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
   }, [nodes, links]);
 
   return (
-    <section 
-      className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl"
+    <Card
+      className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
       aria-label="Account coordination network showing relationships between accounts"
       role="region"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#97d4ee]">Coordination Network</p>
-        <p className="text-xs text-[#9fbfd0]"></p>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <p className="text-caption font-semibold text-text-tertiary uppercase tracking-wider">Coordination Network</p>
+        <p className="text-caption text-text-secondary">Drag nodes • Click for details</p>
       </div>
 
-      <div ref={containerRef} className="mt-4 h-96 rounded-2xl border border-white/10 bg-[#081b25] relative group">
+      <div ref={containerRef} className="h-96 rounded-lg border border-border-default bg-surface-2 relative group">
         <svg ref={svgRef} className="h-full w-full" />
         
         {/* Legend Panel */}
         <motion.div 
-          className="absolute top-4 left-4 rounded-lg border border-white/20 bg-white/[0.08] backdrop-blur-xl p-3 z-10"
+          className="absolute top-4 left-4 rounded-lg border border-border-default bg-surface-2 backdrop-blur-xl p-3 z-10 shadow-md"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <p className="text-xs font-semibold text-[#96c9df] mb-2">Network Legend</p>
+          <p className="text-caption font-semibold text-text-secondary mb-2">Network Legend</p>
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-[#58d3ff]" />
-              <span className="text-xs text-[#9fbfd0]">Account Node</span>
+              <div className="h-3 w-3 rounded-full bg-primary-600" />
+              <span className="text-caption text-text-secondary">Account Node</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-1 w-4 bg-[#59d4ff]" />
-              <span className="text-xs text-[#9fbfd0]">Semantic Link</span>
+              <div className="h-1 w-4 bg-primary-500" />
+              <span className="text-caption text-text-secondary">Semantic Link</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-1 w-4 bg-[#f8be5f]" />
-              <span className="text-xs text-[#9fbfd0]">Temporal Link</span>
+              <div className="h-1 w-4 bg-warning" />
+              <span className="text-caption text-text-secondary">Temporal Link</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-1 w-4 bg-[#ff7d6b]" />
-              <span className="text-xs text-[#9fbfd0]">URL Link</span>
+              <div className="h-1 w-4 bg-error" />
+              <span className="text-caption text-text-secondary">URL Link</span>
             </div>
           </div>
         </motion.div>
@@ -194,21 +197,21 @@ export function NetworkGraph({ nodes, links }: NetworkGraphProps) {
         <motion.aside
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 rounded-2xl border border-white/15 bg-[#0b2532] p-4 text-sm text-[#d6ebf6]"
+          className="mt-4 p-4 bg-surface-2 rounded-lg border border-border-default"
         >
-          <p className="font-semibold text-white">{selected.label}</p>
-          <p className="mt-1 text-xs text-[#96c9df]">Followers: {selected.followers.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-[#96c9df]">Cluster: {selected.cluster}</p>
+          <p className="font-semibold text-text-primary">{selected.label}</p>
+          <p className="mt-1 text-caption text-text-secondary">Followers: {selected.followers.toLocaleString()}</p>
+          <p className="mt-1 text-caption text-text-secondary">Cluster: {selected.cluster}</p>
         </motion.aside>
       ) : (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-4 text-center text-xs text-[#96c9df]"
+          className="mt-4 text-center text-caption text-text-secondary"
         >
           Click on any node to view account details
         </motion.div>
       )}
-    </section>
+    </Card>
   );
 }

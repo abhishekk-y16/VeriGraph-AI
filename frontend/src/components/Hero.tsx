@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { ParticleBackdrop } from "@/components/ParticleBackdrop";
-import { NetworkGraph } from "@/components/NetworkGraph";
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui';
+import { slideUpVariants, containerVariants, itemVariants } from '@/lib/animations';
+import { ParticleBackdrop } from '@/components/ParticleBackdrop';
 
-const words = ["Realtime", "Trust", "Detection"];
+const words = ['Realtime', 'Trust', 'Detection'];
 
 export function Hero() {
   return (
@@ -13,12 +14,12 @@ export function Hero() {
       <div className="hero-gradient pointer-events-none absolute inset-0" aria-hidden="true" />
       <ParticleBackdrop />
 
-      {/* Video Background - Transparent Looping */}
+      {/* Video Background */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2 }}
-        className="absolute top-0 left-0 right-0 h-[600px] z-0 overflow-hidden"
+        className="absolute top-0 left-0 right-0 h-150 z-0 overflow-hidden"
       >
         <video
           autoPlay
@@ -26,43 +27,44 @@ export function Hero() {
           loop
           playsInline
           className="w-full h-full object-cover opacity-40 mix-blend-screen absolute inset-0"
-          style={{ background: "transparent" }}
+          style={{ background: 'transparent' }}
         >
           <source src="/VeriGraph_AI_Trust_Your_Data.mp4" type="video/mp4" />
         </video>
-        {/* Gradient overlay to blend video smoothly */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#031019]/30 to-[#031019] pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-surface-0/30 to-surface-0 pointer-events-none" />
       </motion.div>
 
       <div className="relative mx-auto w-full max-w-7xl z-10">
-        <motion.p
+        {/* Badge */}
+        <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="inline-flex rounded-full border border-[#84d8ff]/40 bg-[#06202d]/70 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[#a4daf5] backdrop-blur-sm"
+          className="inline-flex rounded-full border border-primary-500/40 bg-surface-1/70 px-4 py-2 text-xs uppercase tracking-[0.2em] text-text-secondary backdrop-blur-sm"
         >
           🎬 Coordinated Misinformation Radar
-        </motion.p>
+        </motion.div>
 
+        {/* Main Headline */}
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="mt-12 max-w-5xl text-5xl sm:text-6xl xl:text-7xl font-bold leading-[1.1] text-white"
+          className="mt-12 max-w-5xl text-5xl sm:text-6xl xl:text-display font-bold leading-tight text-text-primary"
         >
-          <span className="bg-gradient-to-r from-[#e8f5ff] via-[#9be2ff] to-[#73d6ff] bg-clip-text text-transparent">
+          <span className="inline-block rounded-2xl bg-surface-0/80 px-4 py-1 text-white shadow-lg shadow-black/40 backdrop-blur-sm">
             VeriGraph AI:
           </span>
-          <span className="block mt-2">
-            Detect coordinated deception with{" "}
-            <span className="inline-flex flex-wrap gap-3 mt-3">
+          <span className="block mt-4">
+            {' '}
+            <span className="inline-flex flex-wrap gap-3 mt-4">
               {words.map((word, index) => (
                 <motion.span
                   key={word}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.12, duration: 0.5 }}
-                  className="rounded-2xl bg-gradient-to-r from-[#9be2ff]/40 to-[#7df5c5]/20 px-4 py-2 text-[#9be2ff] font-bold border border-[#9be2ff]/50 backdrop-blur-md shadow-lg shadow-[#73d6ff]/20"
+                  className="rounded-md bg-linear-to-r from-primary-500/30 to-secondary-500/20 px-4 py-2 text-primary-200 font-bold border border-primary-500/50 backdrop-blur-md shadow-lg shadow-primary-600/20"
                 >
                   {word}
                 </motion.span>
@@ -71,17 +73,20 @@ export function Hero() {
           </span>
         </motion.h1>
 
+        {/* Subheading */}
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-8 max-w-3xl text-base sm:text-lg leading-8 text-[#d0e4f0]"
+          className="mt-8 max-w-3xl text-body sm:text-lg leading-relaxed text-text-secondary"
         >
-          Hybrid intelligence across <span className="text-[#9be2ff] font-semibold">language semantics</span>, 
-          <span className="text-[#7df5c5] font-semibold"> account networks</span>, and 
-          <span className="text-[#ffc96f] font-semibold"> fact verification</span>. Built to show judges real impact in one glance.
+          Hybrid intelligence across{' '}
+          <span className="text-primary-500 font-semibold">language semantics</span>,{' '}
+          <span className="text-success font-semibold">account networks</span>, and{' '}
+          <span className="text-secondary-500 font-semibold">fact verification</span>. Built to show judges real impact in one glance.
         </motion.p>
 
+        {/* CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -89,45 +94,47 @@ export function Hero() {
           className="mt-10 flex flex-wrap gap-4"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link
-              href="/analysis"
-              className="inline-flex rounded-full border-2 border-[#73d6ff]/80 bg-gradient-to-r from-[#73d6ff]/25 to-[#7dd7ff]/15 px-8 py-4 text-sm font-bold text-[#e8f5ff] transition-all duration-300 hover:border-[#73d6ff] hover:from-[#73d6ff]/35 hover:to-[#7dd7ff]/25 hover:shadow-2xl hover:shadow-[#73d6ff]/25 backdrop-blur-md items-center gap-2"
-            >
-              <span>⚡</span> Launch Live Dashboard
+            <Link href="/analysis">
+              <Button size="lg" variant="primary" className="gap-2">
+                <span>⚡</span> Launch Live Dashboard
+              </Button>
             </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <a
-              href="#features"
-              className="inline-flex rounded-full border-2 border-white/30 bg-white/8 px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:border-white/50 hover:bg-white/12 hover:shadow-xl backdrop-blur-md items-center gap-2"
-            >
-              <span>↓</span> Explore Features
+            <Link href="/deepfake">
+              <Button size="lg" variant="secondary" className="gap-2">
+                <span>🎥</span> Deepfake Detection
+              </Button>
+            </Link>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <a href="#features">
+              <Button size="lg" variant="outline" className="gap-2">
+                <span>↓</span> Explore Features
+              </Button>
             </a>
           </motion.div>
         </motion.div>
 
-        {/* Stats Bar */}
+        {/* Stats Grid */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 0.5 }}
           className="mt-16 grid grid-cols-3 gap-4 sm:gap-8"
         >
           {[
-            { label: "Analysis Layers", value: "3" },
-            { label: "Data Sources", value: "1000+" },
-            { label: "Real-time Processing", value: "99.9%" },
+            { label: 'Analysis Layers', value: '3' },
+            { label: 'Data Sources', value: '1000+' },
+            { label: 'Real-time Processing', value: '99.9%' },
           ].map((stat, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + idx * 0.1 }}
-              className="relative"
-            >
-              <div className="rounded-xl border border-white/15 bg-white/5 p-4 sm:p-6 backdrop-blur-sm hover:bg-white/8 transition-all duration-300 group">
-                <p className="text-2xl sm:text-3xl font-bold text-[#9be2ff] group-hover:text-[#e8f5ff] transition-colors">{stat.value}</p>
-                <p className="text-xs sm:text-sm text-[#96c9df] mt-1">{stat.label}</p>
+            <motion.div key={idx} variants={itemVariants}>
+              <div className="rounded-md border border-border-light bg-surface-1/50 p-4 sm:p-6 backdrop-blur-sm hover:bg-surface-1 hover:border-border-lighter transition-all duration-300 group">
+                <p className="text-2xl sm:text-3xl font-bold text-primary-600 group-hover:text-primary-400 transition-colors">
+                  {stat.value}
+                </p>
+                <p className="text-caption sm:text-body-sm text-text-tertiary mt-2">{stat.label}</p>
               </div>
             </motion.div>
           ))}

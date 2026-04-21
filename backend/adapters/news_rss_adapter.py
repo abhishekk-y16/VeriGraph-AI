@@ -18,6 +18,13 @@ class NewsRSSAdapter:
         "ap": "https://apnews.com/hub/ap-top-news/rss",
         "cnn": "http://rss.cnn.com/rss/edition.rss",
     }
+
+    SOURCE_LABELS = {
+        "bbc": "BBC News",
+        "reuters": "Reuters",
+        "ap": "AP News",
+        "cnn": "CNN",
+    }
     
     STOP_WORDS = {
         "a", "about", "above", "after", "again", "against", "all", "am", "an",
@@ -131,7 +138,7 @@ class NewsRSSAdapter:
                         results.append({
                             "id": f"news_{article_id}",
                             "platform": "news_rss",
-                            "username": self._extract_domain(feed_url),
+                            "username": self._source_label(feed_url),
                             "timestamp": timestamp,
                             "text": title[:200],
                             "likes": 0,
@@ -222,6 +229,13 @@ class NewsRSSAdapter:
             return domain[:30] if domain else "News"
         except Exception:
             return "News"
+
+    def _source_label(self, feed_url: str) -> str:
+        feed_url_lower = feed_url.lower()
+        for key, label in self.SOURCE_LABELS.items():
+            if key in feed_url_lower:
+                return label
+        return self._extract_domain(feed_url)
 
     def _demo_data(self, query: str) -> list[dict]:
         """Return demo data when real sources fail, for graph visualization."""

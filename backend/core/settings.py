@@ -24,7 +24,11 @@ class Settings(BaseSettings):
     facebook_app_secret: str = ""
     facebook_max_results: int = 50
 
-    request_timeout_seconds: int = 15
+    newsapi_api_key: str = ""
+    newsapi_base_url: str = "https://newsapi.org/v2/everything"
+    newsapi_max_results: int = 5
+
+    request_timeout_seconds: int = 30
     frontend_origin: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")

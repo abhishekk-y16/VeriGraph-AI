@@ -1,19 +1,21 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Navbar } from "@/components/Navbar";
-import { Hero } from "@/components/Hero";
-import { FeatureShowcase } from "@/components/FeatureShowcase";
-import { Footer } from "@/components/Footer";
-import { analyzeClaim } from "@/lib/api";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Button, Card, CardContent, Badge } from '@/components/ui';
+import { slideUpVariants, containerVariants, itemVariants } from '@/lib/animations';
+import { Navbar } from '@/components/Navbar';
+import { Hero } from '@/components/Hero';
+import { FeatureShowcase } from '@/components/FeatureShowcase';
+import { Footer } from '@/components/Footer';
+import { analyzeClaim } from '@/lib/api';
 
 export default function Home() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
 
   const handleAnalyze = async () => {
     const trimmed = query.trim();
@@ -21,14 +23,14 @@ export default function Home() {
       return;
     }
 
-    setError("");
+    setError('');
     setIsAnalyzing(true);
     try {
       const result = await analyzeClaim(trimmed);
-      window.sessionStorage.setItem("verigraph.analysis", JSON.stringify(result));
-      router.push("/analysis");
+      window.sessionStorage.setItem('verigraph.analysis', JSON.stringify(result));
+      router.push('/analysis');
     } catch (caught) {
-      const message = caught instanceof Error ? caught.message : "Unable to analyze claim right now.";
+      const message = caught instanceof Error ? caught.message : 'Unable to analyze claim right now.';
       setError(message);
     } finally {
       setIsAnalyzing(false);
@@ -36,156 +38,172 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#031019] text-white">
+    <div className="min-h-screen bg-surface-0 text-text-primary">
       <Navbar />
       <main>
         <Hero />
 
-        <section className="relative mx-auto w-full max-w-7xl px-6 py-20">
-          {/* Background elements */}
-          <div className="absolute inset-0 -z-10 opacity-40">
-            <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-[#73d6ff]/20 blur-3xl" />
+        {/* Claim Analysis Section */}
+        <motion.section
+          variants={slideUpVariants}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
+          className="relative mx-auto w-full max-w-7xl px-6 py-20"
+        >
+          {/* Background accent */}
+          <div className="absolute inset-0 -z-10 opacity-20">
+            <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-primary-500/20 blur-3xl" />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6 }}
-            className="rounded-3xl border border-white/20 bg-gradient-to-br from-white/12 to-white/5 p-8 backdrop-blur-2xl shadow-2xl"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-1 h-8 bg-gradient-to-b from-[#73d6ff] to-[#7df5c5] rounded-full" />
-              <p className="text-xs uppercase tracking-[0.3em] font-bold text-[#9be2ff]">Realtime Claim Check</p>
+          <Card variant="default" padding="lg" className="border-border-light shadow-xl">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-8 w-0.5 bg-linear-to-b from-primary-600 to-secondary-500 rounded-full" />
+                <Badge variant="primary" size="sm" className="uppercase">
+                  Realtime Claim Check
+                </Badge>
+              </div>
+
+              <h2 className="text-heading1 font-bold text-text-primary leading-tight">
+                Drop any suspicious claim across web and social
+              </h2>
+
+              <p className="mt-4 max-w-3xl text-body text-text-secondary leading-relaxed">
+                Analyze breaking news, rumors, and claims across millions of websites and social platforms in real-time using our advanced multi-layer intelligence.
+              </p>
             </div>
 
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-white leading-tight">
-              Drop any suspicious claim and launch analysis
-            </h2>
-
-            <p className="mt-4 max-w-2xl text-[#d0e4f0]">
-              Analyze breaking news, rumors, and claims across millions of websites in real-time.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            {/* Search Input Row */}
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <motion.input
-                whileFocus={{ scale: 1.02 }}
+                whileFocus={{ scale: 1.01 }}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
-                placeholder="Type a breaking claim, rumor, or news snippet..."
-                className="flex-1 rounded-2xl border border-white/30 bg-[#0a2332]/80 px-6 py-4 text-sm text-[#dcf1fb] outline-none ring-[#73d6ff] transition focus:ring-2 focus:border-white/50 backdrop-blur-sm placeholder:text-[#7aa2f7]"
+                placeholder="Paste a breaking claim, rumor, or news snippet..."
+                className="flex-1 rounded-sm border border-border-default bg-surface-2 px-4 py-3 text-body text-text-primary outline-none transition-all duration-300 focus:ring-2 focus:ring-primary-600 focus:border-primary-600 placeholder:text-text-muted"
               />
-              <motion.button
-                type="button"
+              <Button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || query.trim().length < 4}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="rounded-2xl border-2 border-[#73d6ff]/80 bg-gradient-to-r from-[#73d6ff]/30 to-[#7dd7ff]/20 px-8 py-4 text-sm font-bold text-[#e8f5ff] transition-all duration-300 hover:border-[#73d6ff] hover:from-[#73d6ff]/40 hover:to-[#7dd7ff]/30 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#73d6ff]/10"
+                isLoading={isAnalyzing}
+                size="lg"
+                className="whitespace-nowrap"
               >
-                {isAnalyzing ? (
-                  <span className="flex items-center gap-2">
-                    <span className="animate-spin">⚡</span> Analyzing...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <span>🔍</span> Analyze Live
-                  </span>
-                )}
-              </motion.button>
+                {isAnalyzing ? 'Analyzing...' : '🔍 Analyze Live'}
+              </Button>
             </div>
 
-            <p className="mt-4 text-sm text-[#96c9df]">
-              ✓ Live data integration • ✓ 1M+ page coverage • ✓ 3-layer analysis • ✓ Real-time results
-            </p>
+            {/* Features row */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              {['✓ Live Data', '✓ 1M+ Coverage', '✓ 3-Layer Analysis', '✓ Real-Time Results'].map((feature, idx) => (
+                <span key={idx} className="text-caption text-text-tertiary font-medium">
+                  {feature}
+                </span>
+              ))}
+            </div>
 
-            {error ? (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mt-3 text-sm text-[#ff9e9e] bg-[#3a1f18]/50 border border-[#ff7d47]/30 rounded-lg p-3"
+            {/* Error message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 rounded-sm border border-error/30 bg-error/10 px-4 py-3 text-body-sm text-error"
               >
                 ⚠ {error}
-              </motion.p>
-            ) : null}
-          </motion.div>
-        </section>
+              </motion.div>
+            )}
+          </Card>
+        </motion.section>
 
         <FeatureShowcase />
 
-        <section id="about" className="relative mx-auto w-full max-w-7xl px-6 pb-20 pt-20">
-          {/* Background gradient */}
-          <div className="absolute inset-0 -z-10 opacity-40">
-            <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-[#7df5c5]/20 blur-3xl" />
-            <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-[#ffc96f]/10 blur-3xl" />
+        {/* About Section */}
+        <motion.section
+          id="about"
+          variants={slideUpVariants}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.2 }}
+          className="relative mx-auto w-full max-w-7xl px-6 py-20"
+        >
+          {/* Background accents */}
+          <div className="absolute inset-0 -z-10 opacity-15">
+            <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-success/40 blur-3xl" />
+            <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-secondary-500/20 blur-3xl" />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7 }}
-            className="rounded-3xl border border-white/20 bg-gradient-to-br from-white/12 via-white/6 to-white/4 p-10 backdrop-blur-2xl shadow-2xl"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <Card variant="default" padding="lg" className="border-border-light">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Content */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-1 h-8 bg-gradient-to-b from-[#7df5c5] to-[#73d6ff] rounded-full" />
-                  <p className="text-xs uppercase tracking-[0.3em] font-bold text-[#7df5c5]">About VeriGraph</p>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-8 w-0.5 bg-linear-to-b from-success to-primary-600 rounded-full" />
+                  <Badge variant="success" size="sm" className="uppercase">
+                    About VeriGraph
+                  </Badge>
                 </div>
 
-                <h3 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
-                  Built for <span className="bg-gradient-to-r from-[#9be2ff] to-[#7df5c5] bg-clip-text text-transparent">trust</span> in realtime information ecosystems
+                <h3 className="text-heading1 font-bold text-text-primary leading-tight">
+                  Building <span className="bg-linear-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent">trust</span> in real-time information ecosystems
                 </h3>
 
-                <p className="mt-6 text-base text-[#d0e4f0] leading-relaxed max-w-2xl">
-                  VeriGraph combines <span className="text-[#9be2ff] font-semibold">language analysis</span>, 
-                  <span className="text-[#7df5c5] font-semibold"> network coordination mapping</span>, and 
-                  <span className="text-[#ffc96f] font-semibold"> fact validation</span> into one intelligence surface.
+                <p className="mt-6 text-body text-text-secondary leading-relaxed">
+                  VeriGraph combines{' '}
+                  <span className="text-primary-600 font-semibold">language analysis</span>,{' '}
+                  <span className="text-success font-semibold">network coordination mapping</span>, and{' '}
+                  <span className="text-secondary-500 font-semibold">fact validation</span> into one unified intelligence surface.
                 </p>
 
-                <p className="mt-4 text-base text-[#b8d4e1] leading-relaxed max-w-2xl">
-                  Instead of a single confidence score, it reveals how misinformation propagates across synchronized accounts so investigators, journalists, and public safety teams can act quickly.
+                <p className="mt-4 text-body text-text-secondary leading-relaxed">
+                  Instead of a single confidence score, it reveals how misinformation propagates across coordinated accounts so investigators, journalists, and public safety teams can act decisively.
                 </p>
 
-                <div className="mt-8 flex gap-4">
-                  <motion.a
-                    href="/analysis"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="inline-flex rounded-full border border-[#7df5c5]/60 bg-[#7df5c5]/15 px-6 py-3 text-sm font-bold text-[#7df5c5] transition-all duration-300 hover:bg-[#7df5c5]/25 hover:border-[#7df5c5]"
-                  >
-                    Try Dashboard ↗
+                <motion.div className="mt-10 flex gap-4">
+                  <motion.a href="/analysis">
+                    <Button size="lg" variant="primary">
+                      Try Dashboard →
+                    </Button>
                   </motion.a>
-                </div>
+                  <motion.a href="#features">
+                    <Button size="lg" variant="outline">
+                      Learn More
+                    </Button>
+                  </motion.a>
+                </motion.div>
               </div>
 
-              {/* Feature Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Feature Grid */}
+              <motion.div
+                variants={containerVariants}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+              >
                 {[
-                  { icon: "🧠", title: "NLP Analysis", desc: "Semantic threat signals" },
-                  { icon: "🔗", title: "Network Graph", desc: "Coordination detection" },
-                  { icon: "✓", title: "Fact Check", desc: "Truth assessment" },
-                  { icon: "📊", title: "Live Feed", desc: "Real-time updates" },
+                  { icon: '🧠', title: 'NLP Analysis', desc: 'Semantic threat signals' },
+                  { icon: '🔗', title: 'Network Graph', desc: 'Coordination detection' },
+                  { icon: '✓', title: 'Fact Check', desc: 'Truth assessment' },
+                  { icon: '📊', title: 'Live Feed', desc: 'Real-time updates' },
                 ].map((feature, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="rounded-xl border border-white/15 bg-white/8 p-4 backdrop-blur hover:bg-white/12 transition-all duration-300 group"
-                  >
-                    <div className="text-2xl mb-2">{feature.icon}</div>
-                    <h4 className="font-bold text-white text-sm group-hover:text-[#9be2ff] transition-colors">{feature.title}</h4>
-                    <p className="text-xs text-[#96c9df] mt-1">{feature.desc}</p>
+                  <motion.div key={idx} variants={itemVariants}>
+                    <Card
+                      variant="interactive"
+                      padding="md"
+                      className="h-full flex flex-col"
+                    >
+                      <div className="text-3xl mb-3">{feature.icon}</div>
+                      <h4 className="font-semibold text-text-primary text-body-sm mb-1">{feature.title}</h4>
+                      <p className="text-caption text-text-secondary">{feature.desc}</p>
+                    </Card>
                   </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
-          </motion.div>
-        </section>
+          </Card>
+        </motion.section>
       </main>
       <Footer />
     </div>

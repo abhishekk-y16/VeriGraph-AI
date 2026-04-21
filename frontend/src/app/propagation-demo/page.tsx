@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { PropagationSpread } from "@/components/PropagationSpread";
 import { LiveAmplificationFeed } from "@/components/LiveAmplificationFeed";
 import { ScoreDisplay } from "@/components/ScoreDisplay";
+import { Card } from "@/components/ui";
 import { motion } from "framer-motion";
+import { slideUpVariants, containerVariants, itemVariants } from "@/lib/animations";
 
 interface AmplificationPost {
   id: string;
@@ -56,7 +58,10 @@ export default function PropagationDemoPage() {
       });
 
       if (!response.ok) {
-        throw new Error("API request failed");
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(
+          errorBody?.error || errorBody?.detail || `API request failed (${response.status})`
+        );
       }
 
       const data = await response.json();
@@ -106,19 +111,19 @@ export default function PropagationDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-surface-darkest via-surface-dark to-surface-darkest">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="border-b border-white/10 bg-white/5 backdrop-blur-xl sticky top-0 z-40"
+        className="border-b border-border-default bg-surface-1/30 backdrop-blur-xl sticky top-0 z-40 shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-display font-bold text-text-primary mb-2">
             Propaganda Propagation Analysis
           </h1>
-          <p className="text-gray-400">
+          <p className="text-body-lg text-text-secondary">
             Track how claims spread across 5 sources with threat assessment and
             live amplification feed
           </p>
@@ -142,12 +147,12 @@ export default function PropagationDemoPage() {
               onKeyPress={handleKeyPress}
               placeholder="Enter a claim to analyze (min 4 characters)..."
               disabled={state.isLoading}
-              className="flex-1 px-6 py-4 rounded-xl border border-white/20 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 transition-all"
+              className="flex-1 px-6 py-4 rounded-lg border border-border-default bg-surface-2 text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-600/50 disabled:opacity-50 transition-all shadow-md"
             />
             <button
               onClick={() => analyzeClaim(query)}
               disabled={state.isLoading}
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="px-8 py-4 rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold hover:shadow-lg hover:shadow-primary-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {state.isLoading ? "Analyzing..." : "Analyze"}
             </button>
@@ -157,17 +162,13 @@ export default function PropagationDemoPage() {
         {/* Results */}
         {state.propagationMetrics ? (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            variants={containerVariants}
+            initial="initial"
+            animate="animate"
             className="space-y-8"
           >
             {/* Threat Assessment */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-            >
+            <motion.div variants={itemVariants}>
               <ScoreDisplay
                 score={state.threatScore}
                 riskLevel={state.riskLevel}
@@ -176,22 +177,14 @@ export default function PropagationDemoPage() {
             </motion.div>
 
             {/* Propagation Metrics */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.4 }}
-            >
+            <motion.div variants={itemVariants}>
               <PropagationSpread metrics={state.propagationMetrics} />
             </motion.div>
 
             {/* Live Amplification Feed */}
             {state.amplificationPosts.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.5 }}
-              >
-                <h2 className="text-xl font-semibold text-white mb-4">
+              <motion.div variants={itemVariants}>
+                <h2 className="text-heading3 font-bold text-text-primary mb-4">
                   Top Amplifiers
                 </h2>
                 <LiveAmplificationFeed
@@ -203,61 +196,63 @@ export default function PropagationDemoPage() {
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-3xl border border-white/15 bg-white/10 p-12 backdrop-blur-xl text-center"
+            variants={slideUpVariants}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
           >
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-6">📊</div>
-              <h2 className="text-2xl font-semibold text-white mb-4">
-                Analyze Propaganda Spread
-              </h2>
-              <p className="text-gray-300 mb-6 text-lg">
-                Enter a claim to see how it propagates across multiple news
-                sources and social platforms
-              </p>
+            <Card>
+              <div className="max-w-lg">
+                <div className="text-6xl mb-6">📊</div>
+                <h2 className="text-heading3 font-bold text-text-primary mb-4">
+                  Analyze Propaganda Spread
+                </h2>
+                <p className="text-body-lg text-text-secondary mb-6">
+                  Enter a claim to see how it propagates across multiple news
+                  sources and social platforms
+                </p>
 
-              <div className="bg-white/10 rounded-lg p-6 mb-6 text-left">
-                <h3 className="font-semibold text-white mb-3">
-                  📰 Data Sources:
-                </h3>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    News RSS feeds (AP, BBC, Reuters, CNN)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                    GDELT global event database
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                    Telegram public channels
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                    CommonCrawl web archive (200B+ pages)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
-                    Facebook public posts
-                  </li>
-                </ul>
-              </div>
+                <div className="bg-surface-2 rounded-lg p-6 mb-6 border border-border-default">
+                  <h3 className="font-semibold text-text-primary mb-3">
+                    📰 Data Sources:
+                  </h3>
+                  <ul className="space-y-2 text-text-secondary text-body-sm">
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-error"></span>
+                      News RSS feeds (AP, BBC, Reuters, CNN)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-warning"></span>
+                      GDELT global event database
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-primary-500"></span>
+                      Telegram public channels
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-success"></span>
+                      CommonCrawl web archive (200B+ pages)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-secondary-500"></span>
+                      Facebook public posts
+                    </li>
+                  </ul>
+                </div>
 
-              <div className="grid grid-cols-1 gap-2">
-                <button
-                  onClick={() => {
-                    setQuery("vaccine safety concerns");
-                    setTimeout(() => analyzeClaim("vaccine safety concerns"), 100);
-                  }}
-                  className="px-4 py-3 rounded-lg border border-white/20 text-white hover:border-white/40 hover:bg-white/10 transition-all text-sm font-medium"
-                >
-                  Example: "vaccine safety concerns"
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setQuery("vaccine safety concerns");
+                      setTimeout(() => analyzeClaim("vaccine safety concerns"), 100);
+                    }}
+                    className="flex-1 px-4 py-3 rounded-lg border border-border-default text-text-primary hover:border-primary-500/40 hover:bg-primary-500/5 transition-all text-body-sm font-medium"
+                  >
+                    Example: "vaccine safety concerns"
+                  </button>
+                </div>
               </div>
-            </div>
+            </Card>
           </motion.div>
         )}
       </div>

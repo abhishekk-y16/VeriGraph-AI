@@ -16,7 +16,8 @@ class ScraperService:
     async def collect(self, query: str) -> list[dict]:
         news_posts, gdelt_posts, telegram_posts, cc_posts, facebook_posts = await self._collect_parallel(query)
         combined = self._dedupe_posts([*news_posts, *gdelt_posts, *telegram_posts, *cc_posts, *facebook_posts])
-        return sorted(combined, key=lambda item: item.get("likes", 0) + item.get("shares", 0), reverse=True)
+        normalized = [self._normalize_post(post) for post in combined]
+        return sorted(normalized, key=lambda item: item.get("likes", 0) + item.get("shares", 0), reverse=True)
 
     async def _collect_parallel(self, query: str) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict]]:
         import asyncio
@@ -60,3 +61,12 @@ class ScraperService:
             deduped.append(post)
         
         return deduped
+
+    def _normalize_post(self, post: dict) -> dict:
+        normalized = dict(post)
+        urls = normalized.get("urls") or []
+        if urls and not normalized.get("url"):
+            normalized["url"] = urls[0]
+        if normalized.get("username") and not normalized.get("sourceName"):
+            normalized["sourceName"] = normalized.get("username")
+        return normalized

@@ -1,16 +1,29 @@
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, File, Header, HTTPException, UploadFile
 from datetime import datetime
+from pathlib import Path
+import shutil
+import tempfile
+import time
 import sys
+import asyncio
 
-from schemas.contracts import AnalyzeRequest, AnalyzeResponse
+from core.settings import settings
+from schemas.contracts import AnalyzeRequest, AnalyzeResponse, DeepfakeMetadata, DeepfakeResponse
+from services.deepfake_detector import (
+    SUPPORTED_IMAGE_EXTENSIONS,
+    SUPPORTED_VIDEO_EXTENSIONS,
+    get_deepfake_detector,
+)
 from services.orchestrator import Orchestrator
 from services.scraper import ScraperService
 from services.propagation_metrics import PropagationMetrics
 
-router = APIRouter(prefix="/api", tags=["analysis"])
+router = APIRouter(tags=["analysis"])
 orchestrator = Orchestrator()
 scraper = ScraperService()
 
+MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
+MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024
 
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(payload: AnalyzeRequest, x_request_id: str | None = Header(default=None)) -> AnalyzeResponse:
@@ -50,7 +63,7 @@ async def analyze_spread(payload: AnalyzeRequest) -> dict:
     
     try:
         # Collect posts from all 5 sources
-        posts = await scraper.collect(query)
+        posts = await asyncio.wait_for(scraper.collect(query), timeout=settings.request_timeout_seconds)
         
         if not posts:
             return {
@@ -63,7 +76,8 @@ async def analyze_spread(payload: AnalyzeRequest) -> dict:
         # Calculate all metrics
         analysis = PropagationMetrics.analyze_spread(posts)
         
-        return {
+        # Build response with sanitization
+        response = {
             'query': query,
             'status': 'success',
             'timestamp': datetime.now().isoformat(),
@@ -71,8 +85,16 @@ async def analyze_spread(payload: AnalyzeRequest) -> dict:
             'analysis': analysis,
             'posts': posts
         }
+        
+        # Sanitize entire response to ensure JSON serialization
+        return PropagationMetrics._sanitize_for_json(response)
     except HTTPException:
         raise
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=504,
+            detail=f"Propagation analysis timed out after {settings.request_timeout_seconds} seconds.",
+        )
     except Exception as exc:
         import traceback
         traceback.print_exc(file=sys.stderr)
@@ -105,7 +127,7 @@ async def get_metric(metric_type: str, query: str) -> dict:
     
     try:
         # Collect posts from all sources
-        posts = await scraper.collect(query)
+        posts = await asyncio.wait_for(scraper.collect(query), timeout=settings.request_timeout_seconds)
         
         if not posts:
             return {
@@ -137,10 +159,66 @@ async def get_metric(metric_type: str, query: str) -> dict:
         }
     except HTTPException:
         raise
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=504,
+            detail=f"Propagation metric request timed out after {settings.request_timeout_seconds} seconds.",
+        )
     except Exception as exc:
         import traceback
         traceback.print_exc(file=sys.stderr)
         error_msg = f"Failed to get {metric_type}: {str(exc)}"
         print(f"ERROR: {error_msg}", file=sys.stderr)
         raise HTTPException(status_code=500, detail=error_msg) from exc
+
+
+@router.post("/deepfake/detect", response_model=DeepfakeResponse)
+async def detect_deepfake(media: UploadFile = File(...)) -> DeepfakeResponse:
+    suffix = Path(media.filename or "").suffix.lower()
+    allowed_extensions = SUPPORTED_IMAGE_EXTENSIONS | SUPPORTED_VIDEO_EXTENSIONS
+    if suffix not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Use JPG, PNG, MP4, AVI, MOV, or MKV.")
+
+    detector = get_deepfake_detector()
+    temp_path: str | None = None
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+            shutil.copyfileobj(media.file, temp_file)
+            temp_path = temp_file.name
+
+        file_size = Path(temp_path).stat().st_size
+        if suffix in SUPPORTED_IMAGE_EXTENSIONS and file_size > MAX_IMAGE_SIZE_BYTES:
+            raise HTTPException(status_code=413, detail="Image file is too large. Maximum size is 10MB.")
+        if suffix in SUPPORTED_VIDEO_EXTENSIONS and file_size > MAX_VIDEO_SIZE_BYTES:
+            raise HTTPException(status_code=413, detail="Video file is too large. Maximum size is 50MB.")
+
+        if suffix in SUPPORTED_IMAGE_EXTENSIONS:
+            result = detector.detect_image(temp_path)
+        else:
+            result = detector.detect_video(temp_path)
+
+        return DeepfakeResponse(
+            mediaType=result.media_type,
+            prediction=result.prediction,
+            confidence=result.confidence,
+            confidenceLevel=detector._confidence_level(result.confidence),
+            processingTimeMs=result.processing_time_ms,
+            message=result.message,
+            metadata=DeepfakeMetadata(**result.metadata),
+        )
+    except HTTPException:
+        raise
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        error_msg = f"Deepfake detection failed: {str(exc)}"
+        print(f"ERROR: {error_msg}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail=error_msg) from exc
+    finally:
+        if temp_path:
+            try:
+                Path(temp_path).unlink(missing_ok=True)
+            except Exception:
+                pass
 

@@ -7,7 +7,7 @@ Calculates metrics including: total reach, platform breakdown, timeline analysis
 
 from datetime import datetime, timedelta
 from collections import defaultdict
-from typing import Optional
+from typing import Optional, Any
 
 
 class PropagationMetrics:
@@ -397,6 +397,25 @@ class PropagationMetrics:
         }
     
     @staticmethod
+    def _sanitize_for_json(obj: Any) -> Any:
+        """
+        Recursively sanitize values to ensure they're JSON-serializable.
+        Converts inf/nan to None.
+        """
+        import math
+        
+        if isinstance(obj, dict):
+            return {k: PropagationMetrics._sanitize_for_json(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [PropagationMetrics._sanitize_for_json(item) for item in obj]
+        elif isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return None
+            return obj
+        else:
+            return obj
+    
+    @staticmethod
     def analyze_spread(posts: list[dict]) -> dict:
         """
         Generate complete propagation analysis combining all metrics.
@@ -407,10 +426,11 @@ class PropagationMetrics:
         Returns:
             Comprehensive spread analysis with all metrics
         """
-        return {
+        result = {
             'total_reach': PropagationMetrics.calculate_total_reach(posts),
             'platform_breakdown': PropagationMetrics.breakdown_by_platform(posts),
             'timeline': PropagationMetrics.calculate_timeline(posts),
             'top_spreaders': PropagationMetrics.identify_top_spreaders(posts),
             'virality': PropagationMetrics.calculate_viral_coefficient(posts)
         }
+        return PropagationMetrics._sanitize_for_json(result)

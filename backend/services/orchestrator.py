@@ -2,6 +2,7 @@ from services.fact_checker import FactChecker
 from services.fusion_engine import FusionEngine
 from services.gnn_analyzer import GNNAnalyzer
 from services.graph_builder import GraphBuilder
+from services.newsapi_verifier import NewsAPIVerifier
 from services.nlp_analyzer import NLPAnalyzer
 from services.scraper import ScraperService
 
@@ -14,9 +15,11 @@ class Orchestrator:
         self.gnn = GNNAnalyzer()
         self.fact_checker = FactChecker()
         self.fusion = FusionEngine()
+        self.newsapi_verifier = NewsAPIVerifier()
 
     async def analyze(self, query: str):
         posts = await self.scraper.collect(query)
+        posts = await self.newsapi_verifier.enrich_posts(posts, query)
 
         nodes, links, metrics = self.graph_builder.build(posts)
 
