@@ -1,6 +1,6 @@
 """
-ML-based Fact Checker using BART-MNLI 
-Replaces Gemini API with local ML model for fast, free fact-checking
+ ML-based Fact Checker using BART-MNLI 
+ Replaces Gemini API with local ML model for fast, free fact-checking
 """
 
 from typing import Dict
